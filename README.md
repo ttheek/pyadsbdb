@@ -42,13 +42,13 @@ print(result)
 
 ### Convert Mode-S to N-Number
 ```python
-result = client.convert_mode_s_to_n_number("A1B2C3")
+result = client.mode_s_to_n_number("A1B2C3")
 print(result)
 ```
 
 ### Convert N-Number to Mode-S
 ```python
-result = client.convert_n_number_to_mode_s("N12345")
+result = client.n_number_to_mode_s("N12345")
 print(result)
 ```
 

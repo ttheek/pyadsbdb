@@ -17,10 +17,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
 ]
-dependencies = [
-  "requests",
-  "re",
-]
+dependencies = ["requests"]
 keywords = ["api", "adsb"]
 
 [project.urls]
