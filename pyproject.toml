@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyadsbdb"
+version = "0.1.0"
+authors = [
+  { name="T.Theekshana" },
+]
+description = "A Python wrapper for the adsbdb API"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+]
+dependencies = [
+  "requests",
+  "re",
+]
+keywords = ["api", "adsb"]
+
+[project.urls]
+Homepage = "https://github.com/ttheek/pyadsbdb"
+Issues = "https://github.com/ttheek/pyadsbdb/issues"
+Repository = "https://github.com/ttheek/pyadsbdb.git"
