@@ -1,2 +1,3 @@
 dist
 pyadsbdb.egg-info/
+__pycache__
