@@ -82,11 +82,31 @@ class Client:
         }
 
     def get_flight_route(self, callsign: str):
+        """
+        Retrieves the flight route information for a given callsign.
+
+        Args:
+            callsign (str): The callsign of the flight to retrieve route information for.
+
+        Returns:
+            dict or str: The flight route information as a dictionary if the request is successful,
+                         or an error message string if the callsign validation fails.
+        """
         if (err := self._validate_str(callsign, "Callsign")):
             return err
         return self._get(f"callsign/{callsign}")
 
     def get_airline(self, airline_code: str) -> Union[dict, ErrorResponse]:
+        """
+        Retrieve information about an airline using its airline code.
+
+        Args:
+            airline_code (str): The IATA airline code (maximum length of 3 characters).
+
+        Returns:
+            Union[dict, ErrorResponse]: A dictionary containing airline information if the request is successful,
+            or an ErrorResponse object if there is an error.
+        """
         if (err := self._validate_str(airline_code, "Airline code", max_len=3)):
             return err
         return self._get(f"airline/{airline_code}")
@@ -96,13 +116,22 @@ class Client:
             return err
 
         result = ModeSCode.create(mode_s)
-        if isinstance(result, dict):  # ErrorResponse
+        if isinstance(result, dict):
             return result
 
         return self._get(f"{self.BASE_URL}/mode-s/{result.value}")
 
 
     def n_number_to_mode_s(self, n_number: str) -> Union[dict, ErrorResponse]:
+        """
+        Converts an N-Number (aircraft registration number) to its corresponding Mode S code.
+        Args:
+            n_number (str): The N-Number (aircraft registration number) to be converted.
+        Returns:
+            Union[dict, ErrorResponse]: 
+                - A dictionary containing the Mode S code if the conversion is successful.
+                - An ErrorResponse object if the input validation or conversion fails.
+        """
         if (err := self._validate_str(n_number, "N-Number")):
             return err
 
