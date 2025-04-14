@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyadsbdb"
-version = "0.1.2"
 authors = [
   { name="T.Theekshana" },
 ]
@@ -19,6 +18,9 @@ classifiers = [
 ]
 dependencies = ["requests"]
 keywords = ["api", "adsb"]
+
+[tool.setuptools.dynamic]
+version = { attr = "pyadsbdb.__version__.__version__" }
 
 [project.urls]
 Homepage = "https://github.com/ttheek/pyadsbdb"

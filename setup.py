@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
+from pyadsbdb.__version__ import __version__
 
 setup(
     name="pyadsbdb",
-    version="0.1.2",
-    packages=find_packages(where='src'),
-    package_dir={'': 'src'},
+    version=__version__,
+    packages=find_packages(exclude=["tests*"]),
     install_requires=["requests"],
     author="T.Theekshana",
     description="A Python wrapper for the adsbdb API",
