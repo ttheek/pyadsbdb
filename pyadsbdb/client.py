@@ -1,7 +1,7 @@
 import requests
 import re
 from typing import Union, Optional
-from .types import AircraftData, ErrorResponse, NNumber,ModeSCode
+from .types import Aircraft, Airline, ErrorResponse, NNumber,ModeSCode
 
 class Client:
     BASE_URL = "https://api.adsbdb.com/v0"
@@ -37,7 +37,7 @@ class Client:
         except requests.exceptions.RequestException as req_err:
             return {"error": f"Request error occurred: {req_err}"}
 
-    def get_aircraft_data(self, identifier: str) -> Union[AircraftData, ErrorResponse]:
+    def get_aircraft_data(self, identifier: str) -> Union[Aircraft, ErrorResponse]:
         """
         Retrieve detailed aircraft data based on the provided identifier.
 
@@ -67,19 +67,10 @@ class Client:
         aircraft_data = response.get("aircraft", {})
         if not isinstance(aircraft_data, dict):
             return {"error": "Invalid aircraft data format."}
-        return {
-            "type": aircraft_data.get("type"),
-            "icao_type": aircraft_data.get("icao_type"),
-            "manufacturer": aircraft_data.get("manufacturer"),
-            "mode_s": aircraft_data.get("mode_s"),
-            "registration": aircraft_data.get("registration"),
-            "registered_owner_country_iso_name": aircraft_data.get("registered_owner_country_iso_name"),
-            "registered_owner_country_name": aircraft_data.get("registered_owner_country_name"),
-            "registered_owner_operator_flag_code": aircraft_data.get("registered_owner_operator_flag_code"),
-            "registered_owner": aircraft_data.get("registered_owner"),
-            "url_photo": aircraft_data.get("url_photo"),
-            "url_photo_thumbnail": aircraft_data.get("url_photo_thumbnail"),
-        }
+        try:
+            return Aircraft.from_dict(aircraft_data)
+        except Exception as e:
+            return {"error": f"Failed to parse aircraft data: {str(e)}"}
 
     def get_flight_route(self, callsign: str):
         """
@@ -96,7 +87,7 @@ class Client:
             return err
         return self._get(f"callsign/{callsign}")
 
-    def get_airline(self, airline_code: str) -> Union[dict, ErrorResponse]:
+    def get_airline(self, airline_code: str) -> Union[Airline, ErrorResponse]:
         """
         Retrieve information about an airline using its airline code.
 
@@ -109,9 +100,28 @@ class Client:
         """
         if (err := self._validate_str(airline_code, "Airline code", max_len=3)):
             return err
-        return self._get(f"airline/{airline_code}")
+        response = self._get(f"airline/{airline_code}")
+        if "error" in response:
+            return {"error": response["error"]}
+        airline_data = response.get("response", [])[0]
+        if not isinstance(airline_data, dict):
+            return {"error": "Invalid airline data format."}
+        try:
+            return Airline.from_dict(airline_data)
+        except Exception as e:
+            return {"error": f"Failed to parse airline data: {str(e)}"}
 
-    def mode_s_to_n_number(self, mode_s: str) -> Union[dict, ErrorResponse]:
+    def modeS2nNumber(self, mode_s: str) -> Union[str, ErrorResponse]:
+        """
+        Converts a Mode-S code to an N-Number (aircraft registration number).
+        Args:
+            mode_s (str): The Mode-S code to be converted. It must be a string of length 6.
+        Returns:
+            Union[str, ErrorResponse]: 
+                - If successful, returns the N-Number as a string.
+                - If an error occurs during validation or processing, returns an ErrorResponse.
+        """
+
         if (err := self._validate_str(mode_s, "Mode-S code", 6)):
             return err
 
@@ -119,10 +129,14 @@ class Client:
         if isinstance(result, dict):
             return result
 
-        return self._get(f"{self.BASE_URL}/mode-s/{result.value}")
+        response: dict = self._get(f"{self.BASE_URL}/mode-s/{result.value}")
+        n_number = response.get("response")
+        if isinstance(n_number, str) and n_number.startswith('N'):
+            return n_number
+        return {"error": f"Invalid Mode-S {mode_s}"}
 
 
-    def n_number_to_mode_s(self, n_number: str) -> Union[dict, ErrorResponse]:
+    def nNumber2ModeS(self, n_number: str) -> Union[dict, ErrorResponse]:
         """
         Converts an N-Number (aircraft registration number) to its corresponding Mode S code.
         Args:
